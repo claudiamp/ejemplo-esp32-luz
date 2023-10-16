@@ -1,0 +1,5 @@
+export const AWS_REGION = '<tu region>'
+export const AWS_IOT_ENDPOINT = '<tu endpoint>'
+export const AWS_COGNITO_IDENTITY_POOL_ID = '<tu cognito identity pool>'
+export const AWS_IOT_PUBLISH_TOPIC = '$aws/things/ESP32/shadow/update'
+export const AWS_IOT_THING = 'ESP32'
