@@ -20,6 +20,7 @@ let light = 'on'
 const icon = document.getElementById('lightbulbIcon')
 const loadingIcon = document.getElementById('loadingIcon')
 const content = document.getElementById('content')
+const button = document.getElementById('toggleButton')
 
 // Configura el cliente de Cognito Identity
 const client = new CognitoIdentityClient({ region: Settings.AWS_REGION })
@@ -121,7 +122,11 @@ connectionPromise.then((connection) => {
     mqtt.QoS.AtLeastOnce,
     (topic, payload, dup, qos, retain) => {
       const status = JSON.parse(Buffer.from(payload))
-      if (status?.state?.reported) changeIcon(status.state.reported.status)
+      if (status?.state?.reported) {
+        light = status?.state?.reported.status === 'on' ? 'off' : 'on'
+        changeIcon(status.state.reported.status)
+        button.disabled = false
+      }
     }
   )
 })
@@ -140,9 +145,6 @@ async function PublishMessage() {
   connectionPromise.then((connection) => {
     connection
       .publish(Settings.AWS_IOT_PUBLISH_TOPIC, msg, mqtt.QoS.AtLeastOnce)
-      .then((message) => {
-        light = light === 'on' ? 'off' : 'on'
-      })
       .catch((reason) => {
         log(`Error publishing: ${reason}`)
       })
@@ -165,6 +167,7 @@ function changeIcon(reportedState) {
 }
 
 // Escucha el evento de clic en el botón con ID 'toggleButton' y llama a la función PublishMessage
-document.getElementById('toggleButton').addEventListener('click', function () {
+button.addEventListener('click', function () {
   PublishMessage()
+  button.disabled = true
 })
